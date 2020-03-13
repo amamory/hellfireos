@@ -3,41 +3,6 @@
 #include <ustack.h>
 #endif
 
-/* hardware dependent C library stuff */
-#ifndef DEBUG_PORT
-void putchar(int32_t value)
-{
-	while (UARTCAUSE & MASK_UART0_WRITEBUSY);
-	UART0 = value;
-}
-
-int32_t kbhit(void)
-{
-	return UARTCAUSE & MASK_UART0_DATAAVAIL;
-}
-
-int32_t getchar(void)
-{
-	while (!kbhit());
-	return UART0;
-}
-#else
-void putchar(int32_t value)
-{
-	DEBUG_ADDR = value;
-}
-
-int32_t kbhit(void)
-{
-	return 0;
-}
-
-int32_t getchar(void)
-{
-	return DEBUG_ADDR;
-}
-#endif
-
 void dputchar(int32_t value)
 {
 	DEBUG_ADDR = value;

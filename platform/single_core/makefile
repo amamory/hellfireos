@@ -15,12 +15,13 @@ KERNEL_LOG = 2
 SRC_DIR = $(CURDIR)/../..
 
 include $(SRC_DIR)/arch/$(ARCH)/arch.mak
-include $(SRC_DIR)/lib/lib.mak
+#include $(SRC_DIR)/lib/lib.mak
 include $(SRC_DIR)/sys/kernel.mak
 include $(SRC_DIR)/$(APP)/app.mak
 
 INC_DIRS += -I $(SRC_DIR)/lib/include -I $(SRC_DIR)/sys/include
-CFLAGS += -DCPU_ARCH=$(CPU_ARCH) -DMAX_TASKS=$(MAX_TASKS) -DMEM_ALLOC=$(MEM_ALLOC) -DHEAP_SIZE=$(HEAP_SIZE) -DMUTEX_TYPE=$(MUTEX_TYPE) -DFLOATING_POINT=$(FLOATING_POINT) -DKERNEL_LOG=$(KERNEL_LOG) -DTERM_BAUD=$(SERIAL_BAUD)
+CFLAGS += -DCPU_ARCH=$(CPU_ARCH) -DMAX_TASKS=$(MAX_TASKS) -DMEM_ALLOC=$(MEM_ALLOC) -DHEAP_SIZE=$(HEAP_SIZE) \
+	-DMUTEX_TYPE=$(MUTEX_TYPE) -DFLOATING_POINT=$(FLOATING_POINT) -DKERNEL_LOG=$(KERNEL_LOG) -DTERM_BAUD=$(SERIAL_BAUD)
 
 serial:
 	stty ${SERIAL_BAUD} raw cs8 -parenb -crtscts clocal cread ignpar ignbrk -ixon -ixoff -ixany -brkint -icrnl -imaxbel -opost -onlcr -isig -icanon -iexten -echo -echoe -echok -echoctl -echoke -F ${SERIAL_DEVICE}
@@ -31,8 +32,9 @@ load: serial
 debug: serial
 	cat ${SERIAL_DEVICE}
 
-image: hal libc kernel app
-	$(LD) $(LDFLAGS) -T$(LINKER_SCRIPT) -Map image.map -o image.elf *.o
+#image: hal libc kernel app
+image: hal  kernel app
+	$(LD) *.o $(LDFLAGS) $(LIB_DIR) -lm -lc_nano -lgcc -T$(LINKER_SCRIPT) -Map image.map -o image.elf 
 	$(DUMP) --disassemble --reloc image.elf > image.lst
 	$(DUMP) -h image.elf > image.sec
 	$(DUMP) -s image.elf > image.cnt

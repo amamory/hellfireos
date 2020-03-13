@@ -1,4 +1,5 @@
 #include <hellfire.h>
+#include <stdio.h> // dprintf
 
 /* defined interrupt handlers */
 void dummy_handler(void);

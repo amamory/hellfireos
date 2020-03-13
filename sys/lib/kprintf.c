@@ -85,7 +85,7 @@ static int32_t kprint(const int8_t *fmt, va_list args)
 
 	return 0;
 }
-
+/*
 static int32_t dprint(const int8_t *fmt, va_list args)
 {
 	int8_t *s;
@@ -126,7 +126,7 @@ static int32_t dprint(const int8_t *fmt, va_list args)
 
 	return 0;
 }
-
+*/
 /**
  * @internal
  * @brief Kernel short version of printf().
@@ -152,6 +152,7 @@ int32_t kprintf(const int8_t *fmt, ...)
  * 
  * @return 0.
  */
+/*
 int32_t dprintf(const int8_t *fmt, ...)
 {
 	va_list args;
@@ -165,3 +166,5 @@ int32_t dprintf(const int8_t *fmt, ...)
 	
 	return r;
 }
+*/
+

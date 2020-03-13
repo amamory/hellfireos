@@ -1,13 +1,6 @@
-/* C type extensions */
-typedef unsigned char			uint8_t;
-typedef char				int8_t;
-typedef unsigned short int		uint16_t;
-typedef short int			int16_t;
-typedef unsigned int			uint32_t;
-typedef int				int32_t;
-typedef unsigned long long		uint64_t;
-typedef long long			int64_t;
-typedef unsigned long			size_t;
+#include <stdint.h>
+#include <stddef.h>
+
 typedef void				(*funcptr)();
 
 /* disable interrupts, return previous int status / enable interrupts */
@@ -310,9 +303,9 @@ int32_t _interrupt_set(int32_t s);
 /* hardware dependent C library stuff */
 int32_t _context_save(context env);
 void _context_restore(context env, int32_t val);
-void putchar(int32_t value);
+//void putchar(int32_t value);
 int32_t kbhit(void);
-int32_t getchar(void);
+//int32_t getchar(void);
 void dputchar(int32_t value);
 
 /* hardware dependent stuff */

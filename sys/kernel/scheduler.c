@@ -15,7 +15,8 @@
  */
 
 #include <hal.h>
-#include <libc.h>
+//#include <libc.h>
+#include <stdio.h> // dprintf
 #include <kprintf.h>
 #include <queue.h>
 #include <kernel.h>
