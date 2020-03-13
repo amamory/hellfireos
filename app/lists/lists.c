@@ -1,4 +1,5 @@
 #include <hellfire.h>
+#include <stdio.h>
 
 void show_list(struct list *l)
 {

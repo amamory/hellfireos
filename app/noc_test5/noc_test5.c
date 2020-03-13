@@ -1,5 +1,6 @@
 #include <hellfire.h>
 #include <noc.h>
+#include <stdio.h>
 
 int32_t callback(uint16_t *buffer)
 {

@@ -1,4 +1,5 @@
 #include <hellfire.h>
+#include <stdio.h>
 
 #define N_READERS	3
 #define N_WRITERS	1

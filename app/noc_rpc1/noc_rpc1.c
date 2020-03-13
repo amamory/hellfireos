@@ -1,6 +1,7 @@
 #include <hellfire.h>
 #include <noc.h>
 #include <noc_rpc.h>
+#include <stdio.h>
 
 struct calc_s {
 	int op;

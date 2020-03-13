@@ -14,6 +14,7 @@
 //#include <fcntl.h>
 //#include <err.h>
 #include <hellfire.h>
+#include <stdio.h>
 
 #define _PATH_RANDOM   "random:"
 

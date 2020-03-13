@@ -1,5 +1,6 @@
 #include <hellfire.h>
 #include <noc.h>
+#include <stdio.h>
 
 void sender(void)
 {

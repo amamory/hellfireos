@@ -1,4 +1,5 @@
 #include <hellfire.h>
+#include <stdio.h>
 
 mutex_t m;
 

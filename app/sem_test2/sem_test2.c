@@ -1,4 +1,5 @@
 #include <hellfire.h>
+#include <stdio.h>
 
 sem_t s1, s2, s3, s4;
 

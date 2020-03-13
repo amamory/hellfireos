@@ -1,5 +1,6 @@
 #include <hellfire.h>
 #include "image.h"
+#include <stdio.h>
 
 uint8_t gaussian(uint8_t buffer[5][5]){
 	int32_t sum = 0, mpixel;

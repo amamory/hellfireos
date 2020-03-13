@@ -3,6 +3,7 @@
 #include <block.h>
 #include <ramdisk.h>
 #include <uhfs.h>
+#include <stdio.h>
 
 void app_main(void){
 	struct device ramdisk0 = {ramdisk_open, ramdisk_read, ramdisk_write, ramdisk_close, ramdisk_ioctl, 0};

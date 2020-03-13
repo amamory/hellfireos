@@ -1,7 +1,6 @@
 #include <hellfire.h>
 #include <stdio.h>
 
-
 void task(void){
 	int32_t jobs, id;
 
