@@ -1,5 +1,6 @@
 #include <hal.h>
-#include <libc.h>
+//#include <libc.h>
+#include <string.h>
 #include <malloc.h>
 #include <mutex.h>
 #include <kernel.h>

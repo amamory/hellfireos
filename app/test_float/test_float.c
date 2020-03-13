@@ -1,4 +1,6 @@
 #include <hellfire.h>
+#include <math.h>
+#include <stdio.h>
 
 float epsilon(void){
 	float x = 1.0f;

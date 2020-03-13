@@ -14,7 +14,8 @@
  */
 
 #include <hal.h>
-#include <libc.h>
+//#include <libc.h>
+#include <stdio.h>
 #include <kprintf.h>
 #include <kernel.h>
 #include <panic.h>

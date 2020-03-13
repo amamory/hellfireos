@@ -1,4 +1,6 @@
 #include <hellfire.h>
+#include <math.h>
+#include <stdio.h>
 
 double epsilon(void){
 	double x = 1.0;

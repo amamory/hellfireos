@@ -15,7 +15,7 @@
  */
 
 #include <hal.h>
-#include <libc.h>
+//#include <libc.h>
 #include <queue.h>
 #include <mutex.h>
 #include <condvar.h>

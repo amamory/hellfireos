@@ -1,5 +1,5 @@
 #include <hal.h>
-#include <libc.h>
+//#include <libc.h>
 
 /*
 crc16 implementation:

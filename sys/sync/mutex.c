@@ -15,7 +15,7 @@
  */
 
 #include <hal.h>
-#include <libc.h>
+//#include <libc.h>
 #include <mutex.h>
 #include <ecodes.h>
 

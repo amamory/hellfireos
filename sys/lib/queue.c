@@ -16,7 +16,7 @@
  */
 
 #include <hal.h>
-#include <libc.h>
+//#include <libc.h>
 #include <malloc.h>
 #include <queue.h>
 

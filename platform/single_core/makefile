@@ -1,4 +1,4 @@
-APP = app/test_float
+APP = app/test_double
 ARCH = riscv/hf-riscv
 
 SERIAL_BAUD=57600

@@ -15,7 +15,8 @@
  */
 
 #include <hal.h>
-#include <libc.h>
+//#include <libc.h>
+#include <stdarg.h>
 #include <kprintf.h>
 
 static int8_t *kitoa(int32_t val, int32_t base)
