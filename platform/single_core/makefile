@@ -1,4 +1,4 @@
-APP = app/sched_test4
+APP = app/test_float
 ARCH = riscv/hf-riscv
 
 SERIAL_BAUD=57600
@@ -15,7 +15,7 @@ KERNEL_LOG = 2
 SRC_DIR = $(CURDIR)/../..
 
 include $(SRC_DIR)/arch/$(ARCH)/arch.mak
-#include $(SRC_DIR)/lib/lib.mak
+include $(SRC_DIR)/lib/lib.mak
 include $(SRC_DIR)/sys/kernel.mak
 include $(SRC_DIR)/$(APP)/app.mak
 
@@ -32,8 +32,7 @@ load: serial
 debug: serial
 	cat ${SERIAL_DEVICE}
 
-#image: hal libc kernel app
-image: hal  kernel app
+image: hal libs kernel app
 	$(LD) *.o $(LDFLAGS) $(LIB_DIR) -lm -lc_nano -lgcc -T$(LINKER_SCRIPT) -Map image.map -o image.elf 
 	$(DUMP) --disassemble --reloc image.elf > image.lst
 	$(DUMP) -h image.elf > image.sec

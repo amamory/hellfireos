@@ -267,6 +267,7 @@ int32_t atoi(const int8_t *s){
 	return (f?-n:n);
 }
 
+/*
 #if FLOATING_POINT == 1
 float atof(const int8_t *p){
 	float val, power;
@@ -312,10 +313,10 @@ int32_t ftoa(float f, int8_t *outbuf, int32_t precision){
 	int_part = 0;
 
 	if (exp2 >= 31){
-		return -1;	/* too large */
+		return -1;	// too large 
 	}else{
 		if (exp2 < -23){
-//			return -1;	/* too small */
+//			return -1;	// too small 
 		}else{
 			if (exp2 >= 23){
 				int_part = mantissa << (exp2 - 23);
@@ -352,6 +353,7 @@ int32_t ftoa(float f, int8_t *outbuf, int32_t precision){
 	return 0;
 }
 #endif
+*/
 
 int8_t *itoa(int32_t i, int8_t *s, int32_t base){
 	int8_t *ptr = s, *ptr1 = s, tmp_char;
