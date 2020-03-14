@@ -4,6 +4,11 @@
 # and this CPU core can be set at the app makefile
 #######################################################
 
+# testing the requirements
+ifndef HFOS_DIR
+    $(error HFOS_DIR is undefined. Please the path to Hellfire OS.)
+endif
+
 # select here the family of processors used in this platform: arm, mips, or riscv ?
 CPU_FAMILY ?= riscv
 # select here the cpu design: check the dir $(HFOS)/arch/$(CPU_FAMILY) to the se supported CPUs
@@ -44,4 +49,4 @@ CPP_SRCS +=
 
 
 # jump to set compiler definitions related to the cpu family and design
-include $(HFOS)/arch/$(CPU_FAMILY)/Makefile
+include $(HFOS_DIR)/arch/$(CPU_FAMILY)/Makefile

@@ -3,6 +3,10 @@
 #######################################################
 
 # testing the requirements
+ifndef HFOS_DIR
+    $(error HFOS_DIR is undefined. Please the path to Hellfire OS.)
+endif
+
 # CPU_FAMILY is arm, or mips, or riscv
 ifndef CPU_FAMILY
     $(error CPU_FAMILY is undefined. Please select a supported CPU family in $(HFOS)/arch/)
@@ -13,7 +17,7 @@ ifndef CPU_DESIGN
     $(error CPU_DESIGN is undefined. Please select a CPU design (in $(HFOS)/arch/$(CPU_FAMILY)) supported by the CPU family $(CPU_FAMILY))
 endif
 
-echo "Selecting CPU Family $(CPU_FAMILY)."
+$(info Selecting CPU Family $(CPU_FAMILY).)
 
 # if the application layer does not set a different prefix, then this one is the default
 TOOLCHAIN_PREFIX ?= riscv32-unknown
@@ -33,6 +37,6 @@ ifneq ("$(wildcard $($(CPU_DESIGN)/Makefile))","")
 	PROJECT_NAME = $(CPU_FAMILY)_$(CPU_DESIGN)
 	# call the makefile for the selected cpu 
 	include $(CPU_DESIGN)/Makefile
-else
-	$(error CPU_DESIGN \"$(CPU_DESIGN)\" not supported. Please select a CPU design (in $(HFOS_DIR)/arch/$(CPU_FAMILY)) supported by the CPU family $(CPU_FAMILY))
+#else
+	#$(error CPU_DESIGN \"$(CPU_DESIGN)\" not supported. Please select a CPU design (in $(HFOS_DIR)/arch/$(CPU_FAMILY)) supported by the CPU family $(CPU_FAMILY))
 endif

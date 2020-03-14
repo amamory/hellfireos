@@ -3,11 +3,20 @@
 #######################################################
 
 # testing the requirements
-ifndef PROJECT_NAME
-    $(error PROJECT_NAME is undefined. Please select a name for the generated files)
+#ifndef PROJECT_NAME
+#    $(error PROJECT_NAME is undefined. Please select a name for the generated files)
+#endif
+
+ifndef HFOS_DIR
+    $(error HFOS_DIR is undefined. Please the path to Hellfire OS.)
 endif
 
-echo "Selecting CPU Design $(CPU_DESIGN)."
+# CPU_DESIGN depends on the selected CPU_FAMILY. For instance, for mips there is support to hf-risc, pic32mz, and plasma
+ifndef CPU_DESIGN
+    $(error CPU_DESIGN is undefined. Please select a CPU design (in $(HFOS)/arch/$(CPU_FAMILY)) supported by the CPU family $(CPU_FAMILY))
+endif
+
+$(info Selecting CPU Design $(CPU_DESIGN).)
 
 # specify here the type of RISCV implemented in this CPU
 RISCV_ARCH = rv32i
