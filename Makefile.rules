@@ -1,0 +1,197 @@
+
+###############################################################################
+#
+# Makefile for compiling STM32F1xx devices, specially, STM32F103C8T6 or bluepill
+# Copyright (C) 2020 Alexandre Amory <amamory@gmail.com>
+#
+###############################################################################
+# RELEVANT VARIABLES:
+#
+# In the TERMINAL, point the LEARNING_STM32 to the directory of the base project.
+# For example:
+#
+#    $ export LEARNING_STM32=$HOME/learning-stm32
+#
+# Alternatively, you can also set this variable in the ~/.bashrc file.
+#
+#
+# In the MAKE command, it is possible to define the other relevant variables:
+#
+#    V=1 : enables verbose mode
+#    DEBUG=1: enables debug mode. Otherwise, the code is optimized for size
+#
+# Usage example:
+#    $ make V=1 <=== enables verbose mode
+#    $ make DEBUG=1 V=1 <=== enables both verbose and debug modes
+###############################################################################
+
+# testing the requirements
+ifndef HFOS_DIR
+    $(error HFOS_DIR is undefined)
+endif
+
+# check variables in the included makefile
+ifndef PROJECT_NAME
+    $(error Please set the required PROJECT_NAME variable in your makefile.)
+endif
+
+# Be silent per default, but 'make V=1' will show all compiler calls.
+ifneq ($(V),1)
+Q := @
+# Do not print "Entering directory ...".
+MAKEFLAGS += --no-print-directory
+endif
+
+# tools
+SIZE_SCRIPT = $(HFOS_DIR)/usr/tools/linker-map-summary/get-size.sh
+
+#https://interrupt.memfault.com/blog/best-and-worst-gcc-clang-compiler-flags#-fstack-usage---wstack-usage
+#https://stackoverflow.com/questions/6387614/how-to-determine-maximum-stack-usage-in-embedded-system-with-gcc
+# used to monitor stack space in a function and emit warnings when the usage is too high.
+# -fstack-usage flag generates a .su files for each compiled c file.
+CP_FLAGS  += -fstack-usage
+
+# gcc enables verbose linker output
+#LD_FLAGS += -Wl,--verbose
+# extra messages
+LD_FLAGS += -Wextra -Wall
+
+# include the modules/drivers requested by the platform
+$(foreach module,$(FEATURES_PROVIDED),$(eval include $(HFOS_DIR)/driver/$(module).mk))
+#$(info $$FEATURES_PROVIDED is [${FEATURES_PROVIDED}])
+
+
+
+
+
+# the -Wstack-usage flag will make sure that the stack limit is not hit
+ifndef STACK_SIZE
+    $(error Please set the required STACK_SIZE variable in your makefile.)
+else
+	# -Wstack-usage=<stack_limit> emit a warning when stack usage exceeds a certain value
+	LDFLAGS  += stack-usage=$(STACK_SIZE)
+endif
+
+# adds -T in front of the linker script file
+# linker script is not mandadory
+ifdef LINKER_SCRIPT
+    LDFLAGS += $(patsubst %, -T%, $(LINKER_SCRIPT))
+endif
+# insert -I in front of every folder in INC_DIRS
+INC_DIR  = $(patsubst %, -I%, $(INC_DIRS))
+# insert -L in front of every folder in LIB_DIRS
+LIB_DIR  = $(patsubst %, -L%, $(LIB_DIRS))
+# insert -l in front of every LDLIBS
+LIB_NAME  = $(patsubst %, -l%, $(LDLIBS))
+# insert -D in front of every DDEFS
+DEF_NAME  = $(patsubst %, -D%, $(DDEFS))
+
+# transfer the library definitions to the linker
+LDFLAGS += $(LIB_DIR) $(LIB_NAME)
+
+# transfer the defines and the include dirs to the compilers
+CFLAGS   += $(INC_DIR) $(DEF_NAME)
+CXXFLAGS += $(INC_DIR) $(DEF_NAME)
+ASFLAGS  += $(INC_DIR) $(DEF_NAME)
+
+#$(info $$INCLUDE_DIRS is [${INCLUDE_DIRS}])
+#$(info $$INC_DIR is [${INC_DIR}])
+#$(info $$LIBRARY_DIRS is [${LIBRARY_DIRS}])
+#$(info $$LIB_DIR is [${LIB_DIR}])
+#$(info SOURCES : $(wildcard $(SRC)))
+
+# expand wildcards to the each type of source file
+C_SRC   = $(wildcard $(C_SRCS))
+ASM_SRC = $(wildcard $(ASM_SRCS))
+CPP_SRC = $(wildcard $(CPP_SRCS))
+
+# create a string with all obj names
+OBJECTS  = $(ASM_SRC:.s=.o) $(C_SRC:.c=.o) $(CPP_SRC:.cpp=.o)
+# I was trying to place all obj files under the BUILD_DIR, similar to
+# https://spin.atomicobject.com/2016/08/26/makefile-c-projects/, but it didnt work
+# i have to try it again
+#BUILD_DIR ?= ./build
+#SRC_FILES2 = $(notdir $(SRC_FILES))
+#OBJECTS    := $(patsubst %.c,$(BUILD_DIR)/%.o,$(SRC_FILES2))
+#$(info $$OBJECTS is [${OBJECTS}])
+
+
+#
+# makefile rules
+#
+all: init_rule $(OBJECTS) $(PROJECT_NAME).elf  $(PROJECT_NAME).hex $(PROJECT_NAME).bin
+	@echo "\\033[1;33m \t----------COMPILATION FINISHED---------- \\033[0;39m"
+	@printf "\n  SIZE        $(PROJECT_NAME).elf\n"
+	$(Q)$(SIZE) $(PROJECT_NAME).elf
+	@printf "  MEM REPORT  $(PROJECT_NAME).elf\n"
+	$(Q)python $(LEARNING_STM32)/utils/linker-map-summary/analyze_map.py $(PROJECT_NAME).map
+	@printf "\n"
+	@echo "\\033[1;33m \t----------REPORTS FINISHED----------- \\033[0;39m"
+
+%.o: %.c | $(OBJ_FOLDER)
+	@printf "  CC      $<\n"
+	$(Q)$(CC) -c $(CFLAGS)    -I . $< -o $@
+
+%.o: %.cpp | $(OBJ_FOLDER)
+	@printf "  CXX     $<\n"
+	$(Q)$(CC) -c $(CXX_FLAGS) -I . $< -o $@
+
+%.o: %.s | $(OBJ_FOLDER)
+	@printf "  AS      $<\n"
+	$(Q)$(AS) -c $(ASFLAGS) $< -o $@
+
+%.elf: $(OBJECTS)
+	@printf "  LD      $(*).elf\n"
+	$(Q)$(CC) $(OBJECTS) $(LDFLAGS) -o $@
+
+%.hex: %.elf
+	@printf "  HEX $@\n"
+	$(Q)$(HEX) -O ihex $< $@
+
+%.bin: %.elf
+	@printf "  BIN $@\n"
+	$(Q)$(BIN) -O binary -S  $< $@
+
+init_rule:
+	@echo "\\033[1;33m \t----------COMPILATION STARTED----------- \\033[0;39m"
+
+$(OBJ_FOLDER):
+	$(Q)mkdir $(BUILD_DIR)
+
+flash: $(PROJECT_NAME).bin
+	@#st-flash write $(PROJECT_NAME).bin 0x8000000
+	@# Make flash to the board by STM32CubeProgrammer v2.2.1
+	STM32_Programmer.sh -c port=SWD -e all -d  $(PROJECT_NAME).bin 0x8000000 -v
+
+# rule used to create static library for the libs that are not supposed to change often: CMSIS, Std_Periph, HAL, openCM3, etc
+lib: init_rule $(OBJECTS)
+	@printf "\n  STATIC LIB  $(PROJECT_NAME).a\n"
+	$(Q)$(AR) -r -s $(PROJECT_NAME).a $(OBJECTS)
+	@echo "\\033[1;33m \t----------COMPILATION FINISHED---------- \\033[0;39m"
+	@printf "\n  REPORT    $(PROJECT_NAME).a\n"
+	@# reporting objs included into the static library, removed unwanted coluns with awk, and sort the objs by their sizes
+	$(Q)$(AR) -tv $(PROJECT_NAME).a | awk '{printf "%8s %s\n", $$3, $$8}' | sort -k 1n
+	@# report text, data, bss and total size for each object. Then, use awk to sum these values and present the total
+	@printf "\n"
+	$(Q)$(SIZE) -d -G $(PROJECT_NAME).a | awk '{c1+=$$1; c2+=$$2; c3+=$$3; c4+=$$4} END {printf "Text size: %.0f\n", c1; printf "Data size: %.0f\n", c2; printf "BSS size: %.0f\n", c3;  printf "Total size: %.0f\n", c4}'
+	@# print the % of flash and ram usage considering 64K of flash and 20K of RAM
+	@echo "\\033[1;33m \t----------REPORTS FINISHED----------- \\033[0;39m"
+
+debug:	$(PROJECT_NAME).elf
+	$(GDB) --eval-command="target extended-remote :4242" $(PROJECT_NAME).elf
+
+erase:
+	$(Q)st-flash erase
+
+clean:
+	$(Q)-rm -rf $(OBJECTS)
+	$(Q)-find . -type f -name '*.o' -delete
+	$(Q)-find . -type f -name '*.su' -delete
+	$(Q)-rm -rf $(BUILD_DIR)
+	$(Q)-rm -rf $(PROJECT_NAME).elf
+	$(Q)-rm -rf $(PROJECT_NAME).map
+	$(Q)-rm -rf $(PROJECT_NAME).hex
+	$(Q)-rm -rf $(PROJECT_NAME).bin
+	$(Q)-rm -rf $(PROJECT_NAME).a
+	@echo "\\033[1;33m \t----------DONE CLEANING----------------- \\033[0;39m"
+

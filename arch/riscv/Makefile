@@ -15,14 +15,17 @@ endif
 
 echo "Selecting CPU Family $(CPU_FAMILY)."
 
-CC   = riscv32-unknown-elf-gcc
-CXX  = riscv32-unknown-elf-g++
-AS   = riscv32-unknown-elf-as
-LD   = riscv32-unknown-elf-ld
-DUMP = riscv32-unknown-elf-objdump -Mno-aliases
-READ = riscv32-unknown-elf-readelf
-OBJ  = riscv32-unknown-elf-objcopy
-SIZE = riscv32-unknown-elf-size
+# if the application layer does not set a different prefix, then this one is the default
+TOOLCHAIN_PREFIX ?= riscv32-unknown
+
+CC   = $(TOOLCHAIN_PREFIX)-elf-gcc
+CXX  = $(TOOLCHAIN_PREFIX)-elf-g++
+AS   = $(TOOLCHAIN_PREFIX)-elf-as
+LD   = $(TOOLCHAIN_PREFIX)-elf-ld
+DUMP = $(TOOLCHAIN_PREFIX)-elf-objdump -Mno-aliases
+READ = $(TOOLCHAIN_PREFIX)-elf-readelf
+OBJ  = $(TOOLCHAIN_PREFIX)-elf-objcopy
+SIZE = $(TOOLCHAIN_PREFIX)-elf-size
 
 # now go the a specific implementation of RISCV cpu
 ifneq ("$(wildcard $($(CPU_DESIGN)/Makefile))","")
@@ -31,5 +34,5 @@ ifneq ("$(wildcard $($(CPU_DESIGN)/Makefile))","")
 	# call the makefile for the selected cpu 
 	include $(CPU_DESIGN)/Makefile
 else
-	$(error CPU_DESIGN \"$(CPU_DESGIN)\" not supported. Please select a CPU design (in $(HFOS)/arch/$(CPU_FAMILY)) supported by the CPU family $(CPU_FAMILY))
+	$(error CPU_DESIGN \"$(CPU_DESIGN)\" not supported. Please select a CPU design (in $(HFOS_DIR)/arch/$(CPU_FAMILY)) supported by the CPU family $(CPU_FAMILY))
 endif
