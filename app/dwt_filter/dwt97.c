@@ -7,6 +7,7 @@
 
 #include <hellfire.h>
 #include <stdio.h>
+#include <stdlib.h> // malloc and free
 
 #define N 32
 

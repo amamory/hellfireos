@@ -84,3 +84,11 @@ int32_t ftoa(float f, int8_t *outbuf, int32_t precision){
 
 	return 0;
 }
+
+void *malloc(size_t size){
+	return hf_malloc(size);
+}
+
+void free(void *ptr){
+	hf_free(ptr);
+}

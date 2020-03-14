@@ -15,6 +15,7 @@
 //#include <err.h>
 #include <hellfire.h>
 #include <stdio.h>
+#include <stdlib.h> // malloc e free
 
 #define _PATH_RANDOM   "random:"
 
@@ -558,7 +559,7 @@ static
 void
 test6(void)
 {
-	int fd, len;
+	//int fd, len;
 	unsigned long seed = _readcounter();
 
 	printf("Beginning malloc test 6\n");
@@ -648,7 +649,7 @@ void thread(void)
 		}
 	}
 
-	return 0;
+	//return 0;
 }
 
 void thread2(void)
@@ -676,7 +677,7 @@ void thread2(void)
 		}
 	}
 
-	return 0;
+	//return 0;
 }
 
 void app_main(void){

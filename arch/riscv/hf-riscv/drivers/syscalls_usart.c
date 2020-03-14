@@ -100,7 +100,9 @@ char *loc_ptr=ptr;
  */
 void *_malloc(size_t nbytes) 
 {   // hf_malloc
-	return NULL;
+	//return NULL;
+	_write (1, "XXXXXXXXXXXXXXXX - Entrei no _malloc\n", 37);
+	return hf_malloc(nbytes);
 }
 
 /*
@@ -110,6 +112,28 @@ void *_malloc(size_t nbytes)
 void _free(void *aptr) 
 {
 	 // hf_free
+	 // read more about issues of newlib's malloc and free
+	 //https://mcuoneclipse.com/2017/07/02/using-freertos-with-newlib-and-newlib-nano/
+	 //https://electronics.stackexchange.com/questions/223929/c-standard-libraries-on-bare-metal
+	 //http://www.nadler.com/embedded/newlibAndFreeRTOS.html
+	 /*
+	 	If you use no threading or tasks, and you don't use malloc/free/etc or any of the reentrancy-dependent 
+		 functions in multiple execution contexts, nothing more is required to use newlib in your application 
+		 (newlib will maintain its required info in the single static structure). If your application or any 
+		 library you use requires malloc/free/etc or any of the reentrancy-dependent functions in multiple 
+		 contexts, newlib requires: 
+		 	-concurrency protection for malloc/free/etc. The free storage pool will be corrupted if multiple 
+			 threads call into these functions concurrently! To prevent reentrant execution of malloc/free/etc 
+			 routines newlib requires hook procedures __malloc_lock/unlock If an RTOS-based application does 
+			 not replace newlib's complete internal malloc family, _malloc_lock/unlock must be provided for 
+			 thread safety.
+   	 		-multiple reentrancy structures (one per context), and a mechanism to create, initialize, and 
+			cleanup these structures, plus switching _impure_ptr to point at the correct reentrancy structure 
+			each time the context changes.
+
+	 */
+	 _write (1, "XXXXXXXXXXXXXXXX - Entrei no _free\n", 35);
+	 hf_free(aptr);
 }
 
 int _close(int file) 

@@ -1,0 +1,15 @@
+-incluir 
+https://github.com/mpaland/printf ou 
+https://github.com/MarioViara/xprintfc ou 
+https://github.com/ARMmbed/mbed-os/tree/master/platform/source/minimal-printf 
+https://os.mbed.com/blog/entry/Reducing-memory-usage-with-a-custom-prin/
+http://www.sparetimelabs.com/tinyprintf/tinyprintf.php
+https://stackoverflow.com/questions/4921553/small-libc-for-embedded-systems
+ p quando newlib nao puder ser usada
+
+- test alternatives to libc_nano
+https://sourceforge.net/p/mspgcc/msp430-libc/ci/master/tree/
+https://salsa.debian.org/electronics-team/toolchains/picolibc
+https://wiki.musl-libc.org/functional-differences-from-glibc.html
+https://uclibc-ng.org/
+
