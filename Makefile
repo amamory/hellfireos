@@ -70,6 +70,8 @@ SIZE_SCRIPT = $(HFOS_DIR)/usr/tools/linker-map-summary/get-size.sh
 
 MAKEFLAGS += --no-print-directory
 
+#STATIC_LIBS =
+
 
 # include the app dir
 MAKE_DIRS += $(HFOS_DIR)/app/$(PROJECT_NAME)
@@ -88,6 +90,9 @@ MAKE_DIRS += $(HFOS_DIR)/platform/$(PLATFORM)
 # get the hardware related info
 # get the toolchain info
 include $(HFOS_DIR)/platform/$(PLATFORM)/config.mk
+# once the platform inform the used CPU, then set CPU related definitions and toolchain
+include $(HFOS_DIR)/arch/$(CPU_FAMILY)/$(CPU_DESIGN)/config.mk
+
 # $(info $$CPU_FAMILY is [${CPU_FAMILY}])
 # $(info $$CPU_DESIGN is [${CPU_DESIGN}])
 # $(info $$ASFLAGS is [${ASFLAGS}])
@@ -96,56 +101,81 @@ include $(HFOS_DIR)/platform/$(PLATFORM)/config.mk
 # $(info $$LINKER_SCRIPT is [${LINKER_SCRIPT}])
 # $(info $$C_SRCS is [${C_SRCS}])
 # $(info $$ASM_SRCS is [${ASM_SRCS}])
-# $(info $$CC is [${CC}])
 
 # # include the OS dir
-# MAKE_DIRS += $(HFOS_DIR)/sys
+MAKE_DIRS += $(HFOS_DIR)/sys
 # # get the info required by the next step
 # include $(HFOS_DIR)/sys/deps.mk
 
+# this variable will have the list of static lib the linker will use
+#STATIC_LIBS = main.a generic.a hellfire_os.a device.a misc.a 
+STATIC_LIBS = /home/lsa/repos/anderson/hfos/app/simple/main.a
+STATIC_LIBS += /home/lsa/repos/anderson/hfos/sys/hellfire_os.a
+STATIC_LIBS += /home/lsa/repos/anderson/hfos/platform/generic/generic.a
+STATIC_LIBS += /home/lsa/repos/anderson/hfos/lib/misc/misc.a
+STATIC_LIBS += /home/lsa/repos/anderson/hfos/drivers/device/device.a
+$(info $$STATIC_LIBS is [${STATIC_LIBS}])
 
 
-# # compile the drivers requested by the applicatio
-# $(foreach module,$(DRIVERS_REQUIRED),MAKE_DIRS += $(HFOS_DIR)/driver/$(module)))
-# #$(info $$DRIVERS_REQUIRED is [${DRIVERS_REQUIRED}])
 
 # # compile the libraries requested by the application
-# $(foreach module,$(LIBS_REQUIRED),   MAKE_DIRS += $(HFOS_DIR)/lib/$(module))
-# #$(info $$LIBS_REQUIRED is [${LIBS_REQUIRED}])
+$(foreach module,$(LIBS_REQUIRED),   $(eval MAKE_DIRS := $(MAKE_DIRS) $(HFOS_DIR)/lib/$(module)))
+$(info $$LIBS_REQUIRED is [${LIBS_REQUIRED}])
+
+# # compile the drivers requested by the applicatio
+$(foreach module,$(DRIVERS_REQUIRED),$(eval MAKE_DIRS := $(MAKE_DIRS) $(HFOS_DIR)/drivers/$(module)))
+$(info $$DRIVERS_REQUIRED is [${DRIVERS_REQUIRED}])
+
+$(info $$MAKE_DIRS is [${MAKE_DIRS}])
+
 
 #
 # makefile rules
 #
 .PHONY: $(MAKE_DIRS)
 
-all: $(MAKE_DIRS) $(PROJECT_NAME).elf $(PROJECT_NAME).hex $(PROJECT_NAME).bin $(PROJECT_NAME).txt
+all: $(PROJECT_NAME).elf $(PROJECT_NAME).hex $(PROJECT_NAME).bin $(PROJECT_NAME).txt
 	@echo "\\033[1;33m \t----------COMPILATION FINISHED---------- \\033[0;39m"
 	@printf "\n  SIZE        $(PROJECT_NAME).elf\n"
 	$(Q)$(SIZE) $(PROJECT_NAME).elf
 	@printf "  MEM REPORT  $(PROJECT_NAME).elf\n"
 	# other similar .map report tool https://fpv-gcc.readthedocs.io/en/latest/usage.html
-	$(Q)python $(HFOS_DIR)/utils/linker-map-summary/analyze_map.py $(PROJECT_NAME).map
+	$(Q)python $(HFOS_DIR)/user/tools/linker-map-summary/analyze_map.py $(PROJECT_NAME).map
 	@printf "\n"
 	@echo "\\033[1;33m \t----------REPORTS FINISHED----------- \\033[0;39m"
 
 clean: $(MAKE_DIRS)
+	$(Q)-find . -type f -name '*.o' -delete
+	$(Q)-find . -type f -name '*.su' -delete
+	$(Q)-rm -rf $(PROJECT_NAME).elf
+	$(Q)-rm -rf $(PROJECT_NAME).map
+	$(Q)-rm -rf $(PROJECT_NAME).hex
+	$(Q)-rm -rf $(PROJECT_NAME).bin
+	$(Q)-rm -rf $(PROJECT_NAME).txt
+	$(Q)-rm -rf $(PROJECT_NAME).a
+
+%.elf: $(STATIC_LIBS)
+	@printf "  LD     $@\n"
+	$(Q)$(LD) $+ -static $(LDFLAGS) -o $@
 
 # MAKECMDGOALS is special variable to the list of goals you specified on the command line
 $(MAKE_DIRS):
-	#cd $@ && make $(MAKECMDGOALS)
 	$(MAKE) --directory=$@ $(MAKECMDGOALS)
 
-%.elf: $(OBJECTS)
-	@printf "  LD      $(*).elf\n"
-	$(Q)$(LD) $(OBJECTS) $(LDFLAGS) -o $@
+$(STATIC_LIBS): $(MAKE_DIRS)
+
+# $+ here means "all of the dependency file names". it means, I link only when all static libs were created
+%.elf: #$(STATIC_LIBS)
+	@printf "  LD     $@\n"
+	$(Q)$(LD) -static $+ $(LDFLAGS) -o $@
 
 %.hex: %.elf
-	@printf "  HEX $@\n"
-	$(Q)$(HEX) -O ihex $< $@
+	@printf "  HEX    $@\n"
+	$(Q)$(CP) -O ihex $< $@
 
 %.bin: %.elf
-	@printf "  BIN $@\n"
-	$(Q)$(BIN) -O binary -S  $< $@
+	@printf "  BIN    $@\n"
+	$(Q)$(CP) -O binary -S  $< $@
 
 %.txt: %.bin
 	@printf "  HEXDUMP $@\n"

@@ -31,7 +31,7 @@ endif
 ifndef PROJECT_NAME
     $(error Please set the required PROJECT_NAME variable in your makefile.)
 endif
-$(warning XXXXXXXXXXXXX PROJECT_NAME=$(PROJECT_NAME))
+#$(warning XXXXXXXXXXXXX PROJECT_NAME=$(PROJECT_NAME))
 
 # Be silent per default, but 'make V=1' will show all compiler calls.
 ifneq ($(V),1)
@@ -91,14 +91,15 @@ OBJECTS  = $(ASM_SRC:.s=.o) $(C_SRC:.c=.o) $(CPP_SRC:.cpp=.o)
 #$(info $$OBJECTS is [${OBJECTS}])
 
 
+#override STATIC_LIBS += $(CURDIR)/$(PROJECT_NAME).a
+$(info $$STATIC_LIBS is [$(CURDIR)/$(PROJECT_NAME).a])
+
 #
 # makefile rules 
 #
 
 # rule used to create static library for the platform, the OS, libs, and drivers
-all: init_rule $(OBJECTS)
-	@printf "\n  STATIC LIB  $(PROJECT_NAME).a\n"
-	$(Q)$(AR) -r -s $(PROJECT_NAME).a $(OBJECTS)
+all: init_rule $(PROJECT_NAME).a
 	@echo "\\033[1;33m \t----------COMPILATION FINISHED---------- \\033[0;39m"
 	@printf "\n  REPORT    $(PROJECT_NAME).a\n"
 	@# reporting objs included into the static library, removed unwanted coluns with awk, and sort the objs by their sizes
@@ -119,6 +120,10 @@ all: init_rule $(OBJECTS)
 	@printf "  AS     $<\n"
 	$(Q)$(AS) -c $(ASFLAGS) $< -o $@
 
+$(PROJECT_NAME).a: $(OBJECTS)
+	@printf "\n  STATIC LIB  $(PROJECT_NAME).a\n"
+	$(Q)$(AR) -r -s $(PROJECT_NAME).a $(OBJECTS)
+
 init_rule:
 	@echo "\\033[1;33m \t----------COMPILATION STARTED----------- \\033[0;39m"
 
@@ -129,11 +134,7 @@ clean:
 	$(Q)-find . -type f -name '*.o' -delete
 	$(Q)-find . -type f -name '*.su' -delete
 	$(Q)-rm -rf $(BUILD_DIR)
-	$(Q)-rm -rf $(PROJECT_NAME).elf
 	$(Q)-rm -rf $(PROJECT_NAME).map
-	$(Q)-rm -rf $(PROJECT_NAME).hex
-	$(Q)-rm -rf $(PROJECT_NAME).bin
-	$(Q)-rm -rf $(PROJECT_NAME).txt
 	$(Q)-rm -rf $(PROJECT_NAME).a
 	@echo "\\033[1;33m \t----------DONE CLEANING----------------- \\033[0;39m"
 

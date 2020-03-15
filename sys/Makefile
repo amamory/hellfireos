@@ -17,7 +17,14 @@ ifndef CPU_DESIGN
 endif
 
 # the name OS static library
-PROJECT_NAME = hellfire_os
+override PROJECT_NAME = hellfire_os
+# add to the list of libs to be linked later
+#STATIC_LIBS += $(PROJECT_NAME)
+
+# kernel version
+export KERNEL_VER = v2.19.03
+# kernel timier
+TIME_SLICE=0
 
 # place here ONLY flags related to the OS. No hardware, or app related flags should be included here !!!!
 ASFLAGS  += 
@@ -40,10 +47,15 @@ KERNEL_LOG ?= 2
 #TODO sergio, are all these defines required by the OS, or by some drivers ?!?!
 # insert here the OS's specific defines
 DDEFS    += CPU_ARCH=$(CPU_ARCH) MAX_TASKS=$(MAX_TASKS) MEM_ALLOC=$(MEM_ALLOC) HEAP_SIZE=$(HEAP_SIZE) \
-	MUTEX_TYPE=$(MUTEX_TYPE) FLOATING_POINT=$(FLOATING_POINT) KERNEL_LOG=$(KERNEL_LOG) TERM_BAUD=$(SERIAL_BAUD)
+	MUTEX_TYPE=$(MUTEX_TYPE) FLOATING_POINT=$(FLOATING_POINT) KERNEL_LOG=$(KERNEL_LOG) TERM_BAUD=$(TERM_BAUD) \
+	CPU_SPEED=$(CPU_SPEED) KERN_VER=\"$(KERNEL_VER)\" TIME_SLICE=${TIME_SLICE} 
 
 # list here all dirs with required include files
-INC_DIRS += ./include
+INC_DIRS += $(HFOS_DIR)/sys/include
+# libc include
+INC_DIRS += $(HFOS_DIR)/lib/include
+#INC_DIRS += $(HFOS_DIR)/lib/misc/include
+INC_DIRS += $(HFOS_DIR)/arch/$(CPU_FAMILY)/$(CPU_DESIGN)/include
 
 # list here all dirs with required static libs 
 LIB_DIRS += 
@@ -62,8 +74,5 @@ CPP_SRCS +=
 # it is possible to define wildcards to C_SRCS, ASM_SRCS, CPP_SRCS
 #C_SRCS += ./my_lovely_dir/*.c
 
-# compile the platform, i.e. the hardware dependent software. It also defines the toolchain 
-cd $(HFOS_DIR)/platform/$(PLATFORM) && make all
-
 # the main rules
-include $(HFOS_DIR)/Makefile.rules
+include $(HFOS_DIR)/Makefile.mk

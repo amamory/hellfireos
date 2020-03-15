@@ -18,6 +18,9 @@ RISCV_ABI  = ilp32
 # this the linker script file, without -T
 #export LINKER_SCRIPT =  $(HFOS_DIR)/arch/$(CPU_FAMILY)/$(CPU_DESIGN)/hf-riscv.ld
 
+# this parameter is dependent of the CPU Design, so it stays here where the user will not mess it up.
+export CPU_SPEED=25000000
+
 # add toolchain definition
 include $(HFOS_DIR)/arch/$(CPU_FAMILY)/Makefile
 

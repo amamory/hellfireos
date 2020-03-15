@@ -12,5 +12,5 @@ export AR   = $(TOOLCHAIN_PREFIX)-elf-ar
 export LD   = $(TOOLCHAIN_PREFIX)-elf-ld
 export DUMP = $(TOOLCHAIN_PREFIX)-elf-objdump
 export READ = $(TOOLCHAIN_PREFIX)-elf-readelf
-export OBJ  = $(TOOLCHAIN_PREFIX)-elf-objcopy
+export CP   = $(TOOLCHAIN_PREFIX)-elf-objcopy
 export SIZE = $(TOOLCHAIN_PREFIX)-elf-size

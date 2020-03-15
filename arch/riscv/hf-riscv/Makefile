@@ -19,13 +19,13 @@ endif
 # add toolchain definition
 #include $(HFOS_DIR)/arch/$(CPU_FAMILY)/$(CPU_DESIGN)/config.mk
 
-# this parameter is dependent of the CPU Design, so it stays here where the user will not mess it up.
-CPU_SPEED=25000000
-
 # list here all dirs with required include files, without -I
 INC_DIRS += $(HFOS_DIR)/arch/$(CPU_FAMILY)/$(CPU_DESIGN)/include
 # HFOS include
 INC_DIRS += $(HFOS_DIR)/sys/include
+INC_DIRS += $(HFOS_DIR)/lib/include
+INC_DIRS += $(HFOS_DIR)/lib/misc/include
+
 
 # insert here the lib's scpecific defines, without -D
 DDEFS    += MAX_TASKS=$(MAX_TASKS) HEAP_SIZE=$(HEAP_SIZE) TERM_BAUD=$(TERM_BAUD) CPU_SPEED=$(CPU_SPEED)

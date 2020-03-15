@@ -17,6 +17,8 @@ endif
 # the name of the static library with all the hardware software
 # use overrride, otherwise it will get the PROJECT_NAME from the main makefile
 override PROJECT_NAME = $(PLATFORM)
+# add to the list of libs to be linked later
+#export STATIC_LIBS += $(PROJECT_NAME)
 
 #include $(HFOS_DIR)/platform/$(PLATFORM)/config.mk
 
