@@ -15,18 +15,19 @@ ifndef PLATFORM
 endif
 
 # the name of the static library with all the hardware software
-PROJECT_NAME = $(PLATFORM)
+# use overrride, otherwise it will get the PROJECT_NAME from the main makefile
+override PROJECT_NAME = $(PLATFORM)
 
 #include $(HFOS_DIR)/platform/$(PLATFORM)/config.mk
 
-$(warning XXXXXXXXXXXXXX1 CFLAGS = $(CFLAGS))
+#$(warning XXXXXXXXXXXXXX1 ASFLAGS = $(ASFLAGS))
 
 # jump to set compiler definitions related to the cpu family and design
 include $(HFOS_DIR)/arch/$(CPU_FAMILY)/$(CPU_DESIGN)/Makefile
 
 $(info Selecting Platform '$(PLATFORM)', CPU Family '$(CPU_FAMILY)', and CPU Design '$(CPU_DESIGN)'.)
 
-$(warning XXXXXXXXXXXXXX2 CFLAGS = $(CFLAGS))
+#$(warning XXXXXXXXXXXXXX2 ASFLAGS = $(ASFLAGS))
 
 # list here the features provided by this board: eth, serial, spi, i2c, noc, sdcard, ... 
 # check the drivers dir to see the list of driver resources

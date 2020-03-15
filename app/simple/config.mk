@@ -1,5 +1,3 @@
-$(info ENTREI simple/config.mk)
-
 #########################
 # HARDWARE CONFIGURATION
 #########################
@@ -42,5 +40,3 @@ DRIVERS_REQUIRED += device
 
 # the libraries listed under $(HFOS_DIR)/libs can be used at the application layer just by listing their lib names
 LIBS_REQUIRED += misc
-
-$(info SAI simple/config.mk)

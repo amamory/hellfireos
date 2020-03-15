@@ -37,7 +37,7 @@ endif
 COMMON_PARAM  += -Wstack-usage=$(STACK_SIZE)
 
 # place here ONLY flags related to this specific CPU implementation. This means that ANY app using this CPU will have these flags
-export ASFLAGS  += -march=$(RISCV_ARCH) -mabi=$(RISCV_ABI) $(COMMON_PARAM)
+export ASFLAGS  += -march=$(RISCV_ARCH) -mabi=$(RISCV_ABI) 
 # TODO review with sergio if all these flags are cpu related or OS related. then, remove all OS related flags
 export CFLAGS   += -march=$(RISCV_ARCH) -mabi=$(RISCV_ABI) -c $(COMMON_PARAM) -mstrict-align -ffreestanding -nostdlib -ffixed-s10 -ffixed-s11 -fomit-frame-pointer
 export CXXFLAGS += -march=$(RISCV_ARCH) -mabi=$(RISCV_ABI) -c $(COMMON_PARAM) 

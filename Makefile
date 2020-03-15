@@ -37,7 +37,7 @@ endif
 ifndef PLATFORM
     $(error Please set the required PLATFORM variable in your makefile.)
 endif
-
+export PLATFORM
 
 # Be silent per default, but 'make V=1' will show all compiler calls.
 ifneq ($(V),1)
@@ -75,28 +75,28 @@ MAKEFLAGS += --no-print-directory
 MAKE_DIRS += $(HFOS_DIR)/app/$(PROJECT_NAME)
 # get the info depedency and the main configurations
 include $(HFOS_DIR)/app/$(PROJECT_NAME)/config.mk
-$(info $$CPU_FAMILY is [${CPU_FAMILY}])
-$(info $$CPU_DESIGN is [${CPU_DESIGN}])
-$(info $$STACK_SIZE is [${STACK_SIZE}])
-$(info $$MAX_TASKS is [${MAX_TASKS}])
-$(info $$DRIVERS_REQUIRED is [${DRIVERS_REQUIRED}])
-$(info $$LIBS_REQUIRED is [${LIBS_REQUIRED}])
-$(info $$TOOLCHAIN_PREFIX is [${TOOLCHAIN_PREFIX}])
+# $(info $$CPU_FAMILY is [${CPU_FAMILY}])
+# $(info $$CPU_DESIGN is [${CPU_DESIGN}])
+# $(info $$STACK_SIZE is [${STACK_SIZE}])
+# $(info $$MAX_TASKS is [${MAX_TASKS}])
+# $(info $$DRIVERS_REQUIRED is [${DRIVERS_REQUIRED}])
+# $(info $$LIBS_REQUIRED is [${LIBS_REQUIRED}])
+# $(info $$TOOLCHAIN_PREFIX is [${TOOLCHAIN_PREFIX}])
 
 # include the hardware dependent software
-MAKE_DIRS  = $(HFOS_DIR)/platform/$(PLATFORM)
+MAKE_DIRS += $(HFOS_DIR)/platform/$(PLATFORM)
 # get the hardware related info
 # get the toolchain info
 include $(HFOS_DIR)/platform/$(PLATFORM)/config.mk
-$(info $$CPU_FAMILY is [${CPU_FAMILY}])
-$(info $$CPU_DESIGN is [${CPU_DESIGN}])
-$(info $$ASFLAGS is [${ASFLAGS}])
-$(info $$CFLAGS is [${CFLAGS}])
-$(info $$LDFLAGS is [${LDFLAGS}])
-$(info $$LINKER_SCRIPT is [${LINKER_SCRIPT}])
-$(info $$C_SRCS is [${C_SRCS}])
-$(info $$ASM_SRCS is [${ASM_SRCS}])
-$(info $$CC is [${CC}])
+# $(info $$CPU_FAMILY is [${CPU_FAMILY}])
+# $(info $$CPU_DESIGN is [${CPU_DESIGN}])
+# $(info $$ASFLAGS is [${ASFLAGS}])
+# $(info $$CFLAGS is [${CFLAGS}])
+# $(info $$LDFLAGS is [${LDFLAGS}])
+# $(info $$LINKER_SCRIPT is [${LINKER_SCRIPT}])
+# $(info $$C_SRCS is [${C_SRCS}])
+# $(info $$ASM_SRCS is [${ASM_SRCS}])
+# $(info $$CC is [${CC}])
 
 # # include the OS dir
 # MAKE_DIRS += $(HFOS_DIR)/sys

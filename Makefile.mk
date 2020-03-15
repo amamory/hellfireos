@@ -1,4 +1,3 @@
-
 ###############################################################################
 #
 # Makefile for compiling STM32F1xx devices, specially, STM32F103C8T6 or bluepill
@@ -32,6 +31,7 @@ endif
 ifndef PROJECT_NAME
     $(error Please set the required PROJECT_NAME variable in your makefile.)
 endif
+$(warning XXXXXXXXXXXXX PROJECT_NAME=$(PROJECT_NAME))
 
 # Be silent per default, but 'make V=1' will show all compiler calls.
 ifneq ($(V),1)
@@ -71,7 +71,7 @@ DEF_NAME  = $(patsubst %, -D%, $(DDEFS))
 # transfer the defines and the include dirs to the compilers
 CFLAGS   += $(INC_DIR) $(DEF_NAME)
 CXXFLAGS += $(INC_DIR) $(DEF_NAME)
-ASFLAGS  += $(INC_DIR) $(DEF_NAME)
+ASFLAGS  += 
 #$(info $$INCLUDE_DIRS is [${INCLUDE_DIRS}])
 
 
