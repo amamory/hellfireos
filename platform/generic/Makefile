@@ -1,7 +1,7 @@
 #######################################################
 # This makefile has platform/system/board specific definitions only
 # This platform is called generic because it consists only of a single CPU core
-# and this CPU core can be set at the app makefile
+# and this CPU core can be set at the app makefile 
 #######################################################
 
 # testing the requirements
@@ -9,11 +9,24 @@ ifndef HFOS_DIR
     $(error HFOS_DIR is undefined. Please the path to Hellfire OS.)
 endif
 
-# select here the family of processors used in this platform: arm, mips, or riscv ?
-CPU_FAMILY ?= riscv
-# select here the cpu design: check the dir $(HFOS)/arch/$(CPU_FAMILY) to the se supported CPUs
-CPU_DESIGN ?= hf-risc
-# at the app makefile level, the user can overwrite these two definitions above to change the type of CPU
+# CPU_DESIGN depends on the selected CPU_FAMILY. For instance, for mips there is support to hf-risc, pic32mz, and plasma
+ifndef PLATFORM
+    $(error PLATFORM is undefined. Please select a platform from $(HFOS)/platform)
+endif
+
+# the name of the static library with all the hardware software
+PROJECT_NAME = $(PLATFORM)
+
+#include $(HFOS_DIR)/platform/$(PLATFORM)/config.mk
+
+$(warning XXXXXXXXXXXXXX1 CFLAGS = $(CFLAGS))
+
+# jump to set compiler definitions related to the cpu family and design
+include $(HFOS_DIR)/arch/$(CPU_FAMILY)/$(CPU_DESIGN)/Makefile
+
+$(info Selecting Platform '$(PLATFORM)', CPU Family '$(CPU_FAMILY)', and CPU Design '$(CPU_DESIGN)'.)
+
+$(warning XXXXXXXXXXXXXX2 CFLAGS = $(CFLAGS))
 
 # list here the features provided by this board: eth, serial, spi, i2c, noc, sdcard, ... 
 # check the drivers dir to see the list of driver resources
@@ -27,7 +40,7 @@ CXXFLAGS +=
 LDFLAGS  += 
 LDLIBS   += 
 # insert here the platform's specific defines 
-DDEFS    +=
+DDEFS    += 
 
 # list here all dirs with required include files
 INC_DIRS += 
@@ -48,5 +61,4 @@ CPP_SRCS +=
 #C_SRCS += ./my_lovely_dir/*.c
 
 
-# jump to set compiler definitions related to the cpu family and design
-include $(HFOS_DIR)/arch/$(CPU_FAMILY)/Makefile
+include $(HFOS_DIR)/Makefile.mk
