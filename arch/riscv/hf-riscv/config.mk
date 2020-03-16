@@ -44,7 +44,7 @@ export ASFLAGS  += -march=$(RISCV_ARCH) -mabi=$(RISCV_ABI)
 # TODO review with sergio if all these flags are cpu related or OS related. then, remove all OS related flags
 export CFLAGS   += -march=$(RISCV_ARCH) -mabi=$(RISCV_ABI) -c $(COMMON_PARAM) -mstrict-align -ffreestanding -nostdlib -ffixed-s10 -ffixed-s11 -fomit-frame-pointer
 export CXXFLAGS += -march=$(RISCV_ARCH) -mabi=$(RISCV_ABI) -c $(COMMON_PARAM) 
-export LDFLAGS  += -melf32lriscv --gc-sections $(CFLAGS_STRIP) -Map=${PROJECT_NAME}.map -T$(HFOS_DIR)/arch/$(CPU_FAMILY)/$(CPU_DESIGN)/hf-riscv.ld
+export LDFLAGS  += -Wl,-melf32lriscv  $(COMMON_PARAM) -Wl,--gc-sections -Wl,-Map=${PROJECT_NAME}.map -T$(HFOS_DIR)/arch/$(CPU_FAMILY)/$(CPU_DESIGN)/hf-riscv.ld
 # the following flag might be usefull ... it prints something like this
 #LD_FLAGS += -Wl,--print-memory-usage
 #Memory region         Used Size  Region Size  %age Used

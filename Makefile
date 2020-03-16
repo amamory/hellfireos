@@ -91,7 +91,7 @@ MAKE_DIRS += $(HFOS_DIR)/platform/$(PLATFORM)
 # get the toolchain info
 include $(HFOS_DIR)/platform/$(PLATFORM)/config.mk
 # once the platform inform the used CPU, then set CPU related definitions and toolchain
-include $(HFOS_DIR)/arch/$(CPU_FAMILY)/$(CPU_DESIGN)/config.mk
+#include $(HFOS_DIR)/arch/$(CPU_FAMILY)/$(CPU_DESIGN)/config.mk
 
 # $(info $$CPU_FAMILY is [${CPU_FAMILY}])
 # $(info $$CPU_DESIGN is [${CPU_DESIGN}])
@@ -112,17 +112,19 @@ MAKE_DIRS += $(HFOS_DIR)/sys
 STATIC_LIBS = /home/lsa/repos/anderson/hfos/app/simple/main.a
 STATIC_LIBS += /home/lsa/repos/anderson/hfos/sys/hellfire_os.a
 STATIC_LIBS += /home/lsa/repos/anderson/hfos/platform/generic/generic.a
-STATIC_LIBS += /home/lsa/repos/anderson/hfos/lib/misc/misc.a
+STATIC_LIBS += /home/lsa/repos/anderson/hfos/lib/libc.a
 STATIC_LIBS += /home/lsa/repos/anderson/hfos/drivers/device/device.a
 $(info $$STATIC_LIBS is [${STATIC_LIBS}])
 
 
 
-# # compile the libraries requested by the application
-$(foreach module,$(LIBS_REQUIRED),   $(eval MAKE_DIRS := $(MAKE_DIRS) $(HFOS_DIR)/lib/$(module)))
-$(info $$LIBS_REQUIRED is [${LIBS_REQUIRED}])
+# compile the libraries requested by the application
+#$(foreach module,$(LIBS_REQUIRED),   $(eval MAKE_DIRS := $(MAKE_DIRS) $(HFOS_DIR)/lib/$(module)))
+#$(info $$LIBS_REQUIRED is [${LIBS_REQUIRED}])
+MAKE_DIRS += $(HFOS_DIR)/lib
 
-# # compile the drivers requested by the applicatio
+
+# compile the drivers requested by the application
 $(foreach module,$(DRIVERS_REQUIRED),$(eval MAKE_DIRS := $(MAKE_DIRS) $(HFOS_DIR)/drivers/$(module)))
 $(info $$DRIVERS_REQUIRED is [${DRIVERS_REQUIRED}])
 
@@ -140,7 +142,7 @@ all: $(PROJECT_NAME).elf $(PROJECT_NAME).hex $(PROJECT_NAME).bin $(PROJECT_NAME)
 	$(Q)$(SIZE) $(PROJECT_NAME).elf
 	@printf "  MEM REPORT  $(PROJECT_NAME).elf\n"
 	# other similar .map report tool https://fpv-gcc.readthedocs.io/en/latest/usage.html
-	$(Q)python $(HFOS_DIR)/user/tools/linker-map-summary/analyze_map.py $(PROJECT_NAME).map
+	$(Q)python $(HFOS_DIR)/usr/tools/linker-map-summary/analyze_map.py $(PROJECT_NAME).map
 	@printf "\n"
 	@echo "\\033[1;33m \t----------REPORTS FINISHED----------- \\033[0;39m"
 
@@ -154,10 +156,6 @@ clean: $(MAKE_DIRS)
 	$(Q)-rm -rf $(PROJECT_NAME).txt
 	$(Q)-rm -rf $(PROJECT_NAME).a
 
-%.elf: $(STATIC_LIBS)
-	@printf "  LD     $@\n"
-	$(Q)$(LD) $+ -static $(LDFLAGS) -o $@
-
 # MAKECMDGOALS is special variable to the list of goals you specified on the command line
 $(MAKE_DIRS):
 	$(MAKE) --directory=$@ $(MAKECMDGOALS)
@@ -165,9 +163,11 @@ $(MAKE_DIRS):
 $(STATIC_LIBS): $(MAKE_DIRS)
 
 # $+ here means "all of the dependency file names". it means, I link only when all static libs were created
-%.elf: #$(STATIC_LIBS)
+# --start-group archives --end-group The specified archives are searched repeatedly until no new undefined references are created.
+# https://eli.thegreenplace.net/2013/07/09/library-order-in-static-linking
+%.elf: $(STATIC_LIBS)
 	@printf "  LD     $@\n"
-	$(Q)$(LD) -static $+ $(LDFLAGS) -o $@
+	$(Q)$(CC) -march=rv32i -mabi=ilp32  -v -static  -Wl,--start-group $+ -Wl,--end-group $(LDFLAGS) -o $@
 
 %.hex: %.elf
 	@printf "  HEX    $@\n"
