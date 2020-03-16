@@ -16,16 +16,12 @@ ifndef CPU_DESIGN
     $(error CPU_DESIGN is undefined. Please select a CPU design (in $(HFOS)/arch/$(CPU_FAMILY)) supported by the CPU family $(CPU_FAMILY))
 endif
 
-# add toolchain definition
-#include $(HFOS_DIR)/arch/$(CPU_FAMILY)/$(CPU_DESIGN)/config.mk
-
 # list here all dirs with required include files, without -I
 INC_DIRS += $(HFOS_DIR)/arch/$(CPU_FAMILY)/$(CPU_DESIGN)/include
 # HFOS include
 INC_DIRS += $(HFOS_DIR)/sys/include
 INC_DIRS += $(HFOS_DIR)/lib/include
 INC_DIRS += $(HFOS_DIR)/lib/misc/include
-
 
 # insert here the lib's scpecific defines, without -D
 DDEFS    += MAX_TASKS=$(MAX_TASKS) HEAP_SIZE=$(HEAP_SIZE) TERM_BAUD=$(TERM_BAUD) CPU_SPEED=$(CPU_SPEED)

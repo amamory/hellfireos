@@ -20,7 +20,7 @@ ASFLAGS  +=
 #enables a base set of warnings generally agreed upon as being useful
 CFLAGS   += -Wall
 #enables an additional set of flags not covered by -Wall
-CFLAGS   += -Wextra  -nodefaultlibs
+CFLAGS   += -Wextra 
 #causes all enabled warnings to cause compilation errors.
 #CFLAGS   += -Werror
 CXXFLAGS += 

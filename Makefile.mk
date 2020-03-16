@@ -1,7 +1,9 @@
 ###############################################################################
 #
-# Makefile for compiling STM32F1xx devices, specially, STM32F103C8T6 or bluepill
-# Copyright (C) 2020 Alexandre Amory <amamory@gmail.com>
+# Makefile for compiling HellFire OS
+# Copyright (C) 2020 
+#      Sergio Johann Filho <?????>
+#      Alexandre Amory <amamory@gmail.com>
 #
 ###############################################################################
 # RELEVANT VARIABLES:
@@ -11,14 +13,11 @@
 #    $ export HFOS_DIR=$HOME/hellfireos
 # Alternatively, you can also set this variable in the ~/.bashrc file.
 #
+# ABOUT THIS MAKEFILE:
 # This makefile is a generic makefile to compile the objs and to create 
 # static libs that will be linked by the main makefile. 
 # This makefile is not meant to be called directly by the used. 
 # It is called by other makefiles.
-#
-# In the MAKE command, it is possible to define the other relevant variables:
-#    V=1 : enables verbose mode
-#    DEBUG=1: enables debug mode. Otherwise, the code is optimized for size
 #
 ###############################################################################
 
@@ -31,7 +30,6 @@ endif
 ifndef PROJECT_NAME
     $(error Please set the required PROJECT_NAME variable in your makefile.)
 endif
-#$(warning XXXXXXXXXXXXX PROJECT_NAME=$(PROJECT_NAME))
 
 # Be silent per default, but 'make V=1' will show all compiler calls.
 ifneq ($(V),1)
@@ -40,7 +38,7 @@ Q := @
 MAKEFLAGS += --no-print-directory
 endif
 
-# tools
+# tool to present a human readable report from .map files
 SIZE_SCRIPT = $(HFOS_DIR)/usr/tools/linker-map-summary/get-size.sh
 
 # # if not defined, these are the default dirs
@@ -57,7 +55,6 @@ SIZE_SCRIPT = $(HFOS_DIR)/usr/tools/linker-map-summary/get-size.sh
 # $(shell mkdir -p $(BINDIR)
 # $(shell mkdir -p $(BUILD_DIR)
 
-
 # insert -I in front of every folder in INC_DIRS
 INC_DIR   = $(patsubst %, -I%, $(INC_DIRS))
 # insert -L in front of every folder in LIB_DIRS
@@ -67,13 +64,10 @@ LIB_NAME  = $(patsubst %, -l%, $(LDLIBS))
 # insert -D in front of every DDEFS
 DEF_NAME  = $(patsubst %, -D%, $(DDEFS))
 
-
 # transfer the defines and the include dirs to the compilers
 CFLAGS   += $(INC_DIR) $(DEF_NAME)
 CXXFLAGS += $(INC_DIR) $(DEF_NAME)
 ASFLAGS  += 
-#$(info $$INCLUDE_DIRS is [${INCLUDE_DIRS}])
-
 
 # expand wildcards to the each type of source file
 C_SRC   = $(wildcard $(C_SRCS))
@@ -90,23 +84,16 @@ OBJECTS  = $(ASM_SRC:.s=.o) $(C_SRC:.c=.o) $(CPP_SRC:.cpp=.o)
 #OBJECTS    := $(patsubst %.c,$(BUILD_DIR)/%.o,$(SRC_FILES2))
 #$(info $$OBJECTS is [${OBJECTS}])
 
-
-#override STATIC_LIBS += $(CURDIR)/$(PROJECT_NAME).a
-$(info $$STATIC_LIBS is [$(CURDIR)/$(PROJECT_NAME).a])
-
 #
 # makefile rules 
 #
-
 # rule used to create static library for the platform, the OS, libs, and drivers
 all: init_rule $(PROJECT_NAME).a
-	@echo "\\033[1;33m \t----------COMPILATION FINISHED---------- \\033[0;39m"
-	@printf "\n  REPORT    $(PROJECT_NAME).a\n"
+	@printf "\n  REPORT $(PROJECT_NAME).a\n"
 	@# reporting objs included into the static library, removed unwanted coluns with awk, and sort the objs by their sizes
 	$(Q)$(AR) -tv $(PROJECT_NAME).a | awk '{printf "%8s %s\n", $$3, $$8}' | sort -k 1n
 	@# report text, data, bss and total size for each object. Then, use awk to sum these values and present the total
 	@printf "\n"
-	@echo "\\033[1;33m \t----------REPORTS FINISHED----------- \\033[0;39m"
 
 %.o: %.c | $(OBJ_FOLDER)
 	@printf "  CC     $<\n"
@@ -121,11 +108,11 @@ all: init_rule $(PROJECT_NAME).a
 	$(Q)$(AS) -c $(ASFLAGS) $< -o $@
 
 $(PROJECT_NAME).a: $(OBJECTS)
-	@printf "\n  STATIC LIB  $(PROJECT_NAME).a\n"
-	$(Q)$(AR) -r -s $(PROJECT_NAME).a $(OBJECTS)
+	$(Q)$(AR) -r -s -c $(PROJECT_NAME).a $(OBJECTS)
 
 init_rule:
-	@echo "\\033[1;33m \t----------COMPILATION STARTED----------- \\033[0;39m"
+	@echo "\\033[1;33m------------------------------------- \\033[0;39m"
+	@echo "\\033[1;33mCOMPILING $(PROJECT_NAME).a \\033[0;39m"
 
 .PHONY: clean
 clean:
@@ -136,5 +123,4 @@ clean:
 	$(Q)-rm -rf $(BUILD_DIR)
 	$(Q)-rm -rf $(PROJECT_NAME).map
 	$(Q)-rm -rf $(PROJECT_NAME).a
-	@echo "\\033[1;33m \t----------DONE CLEANING----------------- \\033[0;39m"
 

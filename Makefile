@@ -1,19 +1,20 @@
-
 ###############################################################################
 #
-# Makefile for compiling STM32F1xx devices, specially, STM32F103C8T6 or bluepill
-# Copyright (C) 2020 Alexandre Amory <amamory@gmail.com>
+# Makefile for compiling HellFire OS
+# Copyright (C) 2020 
+#      Sergio Johann Filho <?????>
+#      Alexandre Amory <amamory@gmail.com>
 #
 ###############################################################################
 # RELEVANT VARIABLES:
 #
-# In the TERMINAL, point the LEARNING_STM32 to the directory of the base project.
+# In the TERMINAL, point the HFOS_DIR var to the directory of the base project.
 # For example:
-#
-#    $ export LEARNING_STM32=$HOME/learning-stm32
-#
+#    $ export HFOS_DIR=$HOME/hellfireos
 # Alternatively, you can also set this variable in the ~/.bashrc file.
 #
+# ABOUT THIS MAKEFILE:
+# TODO: describe me ...
 #
 # In the MAKE command, it is possible to define the other relevant variables:
 #
@@ -30,6 +31,7 @@ ifndef HFOS_DIR
     $(error HFOS_DIR is undefined)
 endif
 
+#TODO: enable to compile an application not in the app dir 
 ifndef PROJECT_NAME
     $(error Please set the required PROJECT_NAME variable in your makefile.)
 endif
@@ -68,22 +70,10 @@ SIZE_SCRIPT = $(HFOS_DIR)/usr/tools/linker-map-summary/get-size.sh
 # HEXFILE ?= $(ELFFILE:.elf=.hex)
 # BINFILE ?= $(ELFFILE:.elf=.bin)
 
-MAKEFLAGS += --no-print-directory
-
-#STATIC_LIBS =
-
-
 # include the app dir
 MAKE_DIRS += $(HFOS_DIR)/app/$(PROJECT_NAME)
 # get the info depedency and the main configurations
 include $(HFOS_DIR)/app/$(PROJECT_NAME)/config.mk
-# $(info $$CPU_FAMILY is [${CPU_FAMILY}])
-# $(info $$CPU_DESIGN is [${CPU_DESIGN}])
-# $(info $$STACK_SIZE is [${STACK_SIZE}])
-# $(info $$MAX_TASKS is [${MAX_TASKS}])
-# $(info $$DRIVERS_REQUIRED is [${DRIVERS_REQUIRED}])
-# $(info $$LIBS_REQUIRED is [${LIBS_REQUIRED}])
-# $(info $$TOOLCHAIN_PREFIX is [${TOOLCHAIN_PREFIX}])
 
 # include the hardware dependent software
 MAKE_DIRS += $(HFOS_DIR)/platform/$(PLATFORM)
@@ -93,58 +83,47 @@ include $(HFOS_DIR)/platform/$(PLATFORM)/config.mk
 # once the platform inform the used CPU, then set CPU related definitions and toolchain
 #include $(HFOS_DIR)/arch/$(CPU_FAMILY)/$(CPU_DESIGN)/config.mk
 
-# $(info $$CPU_FAMILY is [${CPU_FAMILY}])
-# $(info $$CPU_DESIGN is [${CPU_DESIGN}])
-# $(info $$ASFLAGS is [${ASFLAGS}])
-# $(info $$CFLAGS is [${CFLAGS}])
-# $(info $$LDFLAGS is [${LDFLAGS}])
-# $(info $$LINKER_SCRIPT is [${LINKER_SCRIPT}])
-# $(info $$C_SRCS is [${C_SRCS}])
-# $(info $$ASM_SRCS is [${ASM_SRCS}])
-
 # # include the OS dir
 MAKE_DIRS += $(HFOS_DIR)/sys
-# # get the info required by the next step
-# include $(HFOS_DIR)/sys/deps.mk
 
 # this variable will have the list of static lib the linker will use
-#STATIC_LIBS = main.a generic.a hellfire_os.a device.a misc.a 
+# TODO: replace this hack to determine the list of asttic libs
 STATIC_LIBS = /home/lsa/repos/anderson/hfos/app/simple/main.a
 STATIC_LIBS += /home/lsa/repos/anderson/hfos/sys/hellfire_os.a
 STATIC_LIBS += /home/lsa/repos/anderson/hfos/platform/generic/generic.a
 STATIC_LIBS += /home/lsa/repos/anderson/hfos/lib/libc.a
 STATIC_LIBS += /home/lsa/repos/anderson/hfos/drivers/device/device.a
-$(info $$STATIC_LIBS is [${STATIC_LIBS}])
+#$(info $$STATIC_LIBS is [${STATIC_LIBS}])
 
 
-
+# TODO: replace this hack and compile only the requested libs
 # compile the libraries requested by the application
 #$(foreach module,$(LIBS_REQUIRED),   $(eval MAKE_DIRS := $(MAKE_DIRS) $(HFOS_DIR)/lib/$(module)))
 #$(info $$LIBS_REQUIRED is [${LIBS_REQUIRED}])
 MAKE_DIRS += $(HFOS_DIR)/lib
 
-
 # compile the drivers requested by the application
 $(foreach module,$(DRIVERS_REQUIRED),$(eval MAKE_DIRS := $(MAKE_DIRS) $(HFOS_DIR)/drivers/$(module)))
-$(info $$DRIVERS_REQUIRED is [${DRIVERS_REQUIRED}])
+#$(info $$DRIVERS_REQUIRED is [${DRIVERS_REQUIRED}])
 
-$(info $$MAKE_DIRS is [${MAKE_DIRS}])
-
+#$(info $$MAKE_DIRS is [${MAKE_DIRS}])
 
 #
 # makefile rules
 #
+# depedency flow:
+# $(PROJECT_NAME).elf --> $(STATIC_LIBS) --> $(MAKE_DIRS) -->  *.o -->  *.c
 .PHONY: $(MAKE_DIRS)
 
 all: $(PROJECT_NAME).elf $(PROJECT_NAME).hex $(PROJECT_NAME).bin $(PROJECT_NAME).txt
-	@echo "\\033[1;33m \t----------COMPILATION FINISHED---------- \\033[0;39m"
+	@echo "\\033[1;33m----------COMPILATION FINISHED---------- \\033[0;39m"
 	@printf "\n  SIZE        $(PROJECT_NAME).elf\n"
 	$(Q)$(SIZE) $(PROJECT_NAME).elf
-	@printf "  MEM REPORT  $(PROJECT_NAME).elf\n"
-	# other similar .map report tool https://fpv-gcc.readthedocs.io/en/latest/usage.html
-	$(Q)python $(HFOS_DIR)/usr/tools/linker-map-summary/analyze_map.py $(PROJECT_NAME).map
+	@printf "\n  MEM REPORT  $(PROJECT_NAME).elf\n"
+	@# other similar .map report tool https://fpv-gcc.readthedocs.io/en/latest/usage.html
+	$(Q)python $(HFOS_DIR)/usr/tools/linker-map-summary/analyze_map.py $(PROJECT_NAME).map | column -t -s' '
 	@printf "\n"
-	@echo "\\033[1;33m \t----------REPORTS FINISHED----------- \\033[0;39m"
+	@echo "\\033[1;33m----------REPORTS FINISHED----------- \\033[0;39m"
 
 clean: $(MAKE_DIRS)
 	$(Q)-find . -type f -name '*.o' -delete
@@ -158,7 +137,7 @@ clean: $(MAKE_DIRS)
 
 # MAKECMDGOALS is special variable to the list of goals you specified on the command line
 $(MAKE_DIRS):
-	$(MAKE) --directory=$@ $(MAKECMDGOALS)
+	$(Q)$(MAKE) --directory=$@ $(MAKECMDGOALS)
 
 $(STATIC_LIBS): $(MAKE_DIRS)
 
@@ -167,7 +146,7 @@ $(STATIC_LIBS): $(MAKE_DIRS)
 # https://eli.thegreenplace.net/2013/07/09/library-order-in-static-linking
 %.elf: $(STATIC_LIBS)
 	@printf "  LD     $@\n"
-	$(Q)$(CC) -march=rv32i -mabi=ilp32  -v -static  -Wl,--start-group $+ -Wl,--end-group $(LDFLAGS) -o $@
+	$(Q)$(CC)  -Wl,--start-group $+ -Wl,--end-group $(LDFLAGS) -o $@
 
 %.hex: %.elf
 	@printf "  HEX    $@\n"
@@ -181,20 +160,17 @@ $(STATIC_LIBS): $(MAKE_DIRS)
 	@printf "  HEXDUMP $@\n"
 	$(Q)hexdump -v -e '4/1 "%02x" "\n"' $< > $@
 
-#init_rule:
-#	@echo "\\033[1;33m \t----------COMPILATION STARTED----------- \\033[0;39m"
-
+#TODO ????
 flash: $(PROJECT_NAME).bin
 	@#st-flash write $(PROJECT_NAME).bin 0x8000000
 	@# Make flash to the board by STM32CubeProgrammer v2.2.1
 	STM32_Programmer.sh -c port=SWD -e all -d  $(PROJECT_NAME).bin 0x8000000 -v
 
+#TODO ????
 debug:	$(PROJECT_NAME).elf
 	$(GDB) --eval-command="target extended-remote :4242" $(PROJECT_NAME).elf
 
+#TODO ????
 .PHONY: erase
 erase:
 	$(Q)st-flash erase
-
-
-

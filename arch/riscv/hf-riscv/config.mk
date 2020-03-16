@@ -15,9 +15,6 @@ endif
 RISCV_ARCH = rv32i
 RISCV_ABI  = ilp32
 
-# this the linker script file, without -T
-#export LINKER_SCRIPT =  $(HFOS_DIR)/arch/$(CPU_FAMILY)/$(CPU_DESIGN)/hf-riscv.ld
-
 # this parameter is dependent of the CPU Design, so it stays here where the user will not mess it up.
 export CPU_SPEED=25000000
 
@@ -44,7 +41,7 @@ export ASFLAGS  += -march=$(RISCV_ARCH) -mabi=$(RISCV_ABI)
 # TODO review with sergio if all these flags are cpu related or OS related. then, remove all OS related flags
 export CFLAGS   += -march=$(RISCV_ARCH) -mabi=$(RISCV_ABI) -c $(COMMON_PARAM) -mstrict-align -ffreestanding -nostdlib -ffixed-s10 -ffixed-s11 -fomit-frame-pointer
 export CXXFLAGS += -march=$(RISCV_ARCH) -mabi=$(RISCV_ABI) -c $(COMMON_PARAM) 
-export LDFLAGS  += -Wl,-melf32lriscv  $(COMMON_PARAM) -Wl,--gc-sections -Wl,-Map=${PROJECT_NAME}.map -T$(HFOS_DIR)/arch/$(CPU_FAMILY)/$(CPU_DESIGN)/hf-riscv.ld
+export LDFLAGS  += -march=$(RISCV_ARCH) -mabi=$(RISCV_ABI) -static -Wl,-melf32lriscv  $(COMMON_PARAM) -Wl,--gc-sections -Wl,-Map=${PROJECT_NAME}.map -T$(HFOS_DIR)/arch/$(CPU_FAMILY)/$(CPU_DESIGN)/hf-riscv.ld
 # the following flag might be usefull ... it prints something like this
 #LD_FLAGS += -Wl,--print-memory-usage
 #Memory region         Used Size  Region Size  %age Used
